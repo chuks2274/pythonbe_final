@@ -8,27 +8,27 @@ import traceback # Import traceback to print detailed error stack traces (useful
 
 # Decorator to catch and handle database-related errors in route functions
 def handle_db_exceptions(fn):
-    @wraps(fn)  # Preserve the original function's metadata
+    @wraps(fn)   
     def wrapper(*args, **kwargs):
         try:
             # Try to run the original function
             return fn(*args, **kwargs)
         except IntegrityError as e:
             # Handle database integrity errors (like duplicate keys)
-            db.session.rollback()  # Undo current DB changes to keep data safe
-            return jsonify({"error": "Integrity error", "details": str(e)}), 400  # Send error with HTTP 400 Bad Request
+            db.session.rollback()   
+            return jsonify({"error": "Integrity error", "details": str(e)}), 400   
         except NotFound as e:
             # Handle 404 errors when something is not found
             return jsonify({"error": "Not Found", "details": str(e)}), 404
         except SQLAlchemyError as e:
             # Handle general SQLAlchemy database errors
-            db.session.rollback()  # Undo DB changes to avoid corrupt data
-            return jsonify({"error": "Database error", "details": str(e)}), 500  # Internal Server Error
+            db.session.rollback()   
+            return jsonify({"error": "Database error", "details": str(e)}), 500   
         except Exception as e:
             # Catch any other unexpected errors
-            db.session.rollback()  # Undo DB changes as a precaution
-            print(traceback.format_exc())  # Print detailed error trace to the console for debugging
-            return jsonify({"error": "Unexpected error", "details": str(e)}), 500  # Internal Server Error
+            db.session.rollback()   
+            print(traceback.format_exc())   
+            return jsonify({"error": "Unexpected error", "details": str(e)}), 500   
     return wrapper
 
 

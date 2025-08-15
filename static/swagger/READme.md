@@ -1,5 +1,21 @@
 # Mechanic Workshop API
 
+![CI/CD Pipeline](https://github.com/chuks2274/pythonbe_final/actions/workflows/main.yaml/badge.svg)
+
+## CI/CD Pipeline
+
+This project uses **GitHub Actions** for continuous integration and deployment to **Render**.
+
+### Workflow Overview
+- **Build:** Installs dependencies.
+- **Test:** Runs automated tests.
+- **Deploy:** Automatically deploys to Render if tests pass and changes are pushed to `main`.
+
+### Live Deployment
+
+- **API Documentation (Swagger UI):** https://pythonbe-final.onrender.com/docs  
+- **Base API URL:** https://pythonbe-final.onrender.com/api/
+
 This project provides a RESTful API for managing a mechanic workshop, including Customers, Mechanics, Service Tickets, and Inventory. The API is documented using Swagger 2.0 and supports secure endpoints via JWT-based authentication.
 
 ## Features
@@ -11,17 +27,10 @@ This project provides a RESTful API for managing a mechanic workshop, including 
 - **JWT Authentication**: Secure endpoints for authorized users (both customers and mechanics).
 - **Pagination Support**: Most list endpoints support pagination via `?page=1&per_page=10`.
 
-## API Documentation
-
-Swagger UI can be used to explore the API.
-
-**Base URL:**  
-http://localhost:5000/api
-
 ### Authentication
 
-All protected routes require a JWT token in the `Authorization` header using the format:
-Authorization: Bearer <your_token>
+All protected routes require a JWT token in the `Authorization` header using the format:  
+`Authorization: Bearer <your_token>`
 
 ## Endpoints
 
@@ -94,14 +103,6 @@ The API uses the following object definitions:
 
 These definitions specify the required fields and types for creating or returning data objects.
 
-## How to View Swagger UI
-
-To view the Swagger documentation in a browser:
-
-1. Start the Flask server (`flask run` or however your project is configured).
-2. Visit: http://localhost:5000/docs
-
-*(Make sure your app serves Swagger UI at this path)*
 
 ## Built With
 

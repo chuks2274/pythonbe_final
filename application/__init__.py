@@ -1,10 +1,10 @@
-from flask import Flask  # Import Flask class to create the Flask application
-from .extensions import db, ma, cache, limiter, migrate  # Import extensions
-from .blueprints.mechanic import mechanic_bp
-from .blueprints.customer import customer_bp
-from .blueprints.service_ticket import service_ticket_bp
-from .blueprints.inventory import inventory_bp
-from .models import *  # Import all models (database tables)
+from flask import Flask  # Import the Flask class; used to create the main Flask application instance
+from .extensions import db, ma, cache, limiter, migrate  # Import Flask extensions: db, ma, cache, limiter, migrate
+from .blueprints.mechanic import mechanic_bp  # Import the mechanic blueprint to register mechanic-related routes
+from .blueprints.customer import customer_bp # Import the customer blueprint for customer-related routes
+from .blueprints.service_ticket import service_ticket_bp # Import the service_ticket blueprint for service ticket routes
+from .blueprints.inventory import inventory_bp  # Import the inventory blueprint for inventory/parts routes
+from .models import *  # Import all database models (tables) to make them available for ORM and migrations
 
 
 # Function to create and configure the Flask app

@@ -1,4 +1,20 @@
-# Mechanic Shop Project
+# Mechanic Workshop API
+
+![CI/CD Pipeline](https://github.com/chuks2274/pythonbe_final/actions/workflows/main.yaml/badge.svg)
+
+## CI/CD Pipeline
+
+This project uses **GitHub Actions** for continuous integration and deployment to **Render**.
+
+### Workflow Overview
+- **Build:** Installs dependencies.
+- **Test:** Runs automated tests.
+- **Deploy:** Automatically deploys to Render if tests pass and changes are pushed to `main`.
+
+### Live Deployment
+
+- **API Documentation (Swagger UI):** https://pythonbe-final.onrender.com/docs  
+- **Base API URL:** https://pythonbe-final.onrender.com/api/
 
 ## app.py
 ### What This File Does
