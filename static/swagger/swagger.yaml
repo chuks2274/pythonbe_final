@@ -1,0 +1,997 @@
+# Swagger 2.0 specification for Mechanic Workshop API documentation
+swagger: "2.0"
+info:
+  version: "1.0.0"
+  title: Mechanic Workshop API
+  description: API documentation for Customers, Mechanics, Service Tickets, and Inventory.
+# API server configuration specifying host, base path, and HTTP scheme
+host: localhost:5000
+basePath: /api
+schemes:
+  - http
+# Security definition for JWT Bearer token authentication via Authorization header
+securityDefinitions:
+  BearerAuth:
+    type: apiKey
+    name: Authorization
+    in: header
+    description: >
+      JWT Token authentication. Use 'Bearer <your-token>' format.
+# Tags categorizing API endpoints by resource type
+tags:
+  - name: Customers
+  - name: Mechanics
+  - name: Service Tickets
+  - name: Inventory
+
+paths:
+# Create a new customer account and return the created customer details
+  /customers:
+    post:
+      tags:
+        - Customers
+      summary: Create Customer
+      description: Registers a new customer account
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/CustomerInput'
+      responses:
+        201:
+          description: Customer created successfully
+          schema:
+            $ref: '#/definitions/Customer'
+          examples:
+            application/json:
+              id: 1
+              name: "Clark Kent"
+              email: "clark@example.com"
+              address: "123 Main St, Metropolis, NY"
+              phone: "+1-555-123-4567"
+# Retrieve a paginated list of all registered customers
+  /customers/:
+    get:
+      tags:
+        - Customers
+      summary: Find All Customers (Paginated)
+      description: Returns a paginated list of customers.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          type: integer
+          required: false
+          description: "Page number (default: 1)"
+        - name: per_page
+          in: query
+          type: integer
+          required: false
+          description: "Results per page (default: 10)"
+      responses:
+        200:
+          description: A paginated list of customers.
+          schema:
+            type: object
+            properties:
+              customers:
+                type: array
+                items:
+                  $ref: '#/definitions/Customer'
+              total:
+                type: integer
+                example: 50
+              pages:
+                type: integer
+                example: 5
+              current_page:
+                type: integer
+                example: 1
+# Authenticate a customer and return a JWT token
+  /customers/login:
+    post:
+      tags:
+        - Customers
+      summary: Customer Login (Token Auth)
+      description: "Logs in a customer and returns a JWT token along with customer details."
+      parameters:
+        - in: body
+          name: credentials
+          required: true
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+              password:
+                type: string
+            example:
+              email: "clark@example.com"
+              password: "supersecret123"
+      responses:
+        200:
+          description: "Login successful"
+          schema:
+            type: object
+            properties:
+              access_token:
+                type: string
+              token_type:
+                type: string
+              customer:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+            examples:
+              application/json:
+                access_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                token_type: "Bearer"
+                customer:
+                  id: 1
+                  name: "Clark Kent"
+# Retrieve a customer's details by their ID (requires authentication)
+  /customers/{id}:
+    get:
+      tags: [Customers]
+      summary: Find Customer by ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: integer
+      responses:
+        200:
+          description: Customer data
+          schema:
+            $ref: '#/definitions/Customer'
+# Update a customer's information by their ID (requires authentication)
+    put:
+      tags:
+        - Customers
+      summary: Update Customer by ID
+      description: "Updates an existing customer account."
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          type: integer
+          required: true
+          description: ID of the customer to update
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/CustomerInput'
+            example:
+              name: "Clark Kent"
+              email: "clark@example.com"
+              password: "newpassword123"
+              address: "456 Elm St, Metropolis, NY"
+              phone: "+1-555-987-6543"
+      responses:
+        200:
+          description: "Customer updated successfully"
+          schema:
+            $ref: '#/definitions/Customer'
+          examples:
+            application/json:
+              id: 1
+              name: "Clark Kent"
+              email: "clark@example.com"
+              address: "456 Elm St, Metropolis, NY"
+              phone: "+1-555-987-6543"
+# Delete the logged-in customer's account by ID
+    delete:
+      tags: [Customers]
+      summary: Delete Customer by ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: integer
+          description: ID of the customer to delete
+      responses:
+        204:
+          description: Customer deleted successfully
+        401:
+          description: Unauthorized – invalid or missing token
+        404:
+          description: Customer not found
+# Retrieve all service tickets associated with the authenticated customer
+  /customers/my-tickets:
+    get:
+      tags: [Customers]
+      summary: Find Service Tickets for Authenticated Customer
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: A list of service tickets
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ServiceTicket'
+# Create a new mechanic and return the created mechanic details
+  /mechanics:
+    post:
+      tags:
+        - Mechanics
+      summary: Create Mechanic
+      description: "Registers a new mechanic account."
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/MechanicInput'
+            example:
+              name: "Emily Smith"
+              email: "emily@example.com"
+              password: "securepassword123"
+              specialty: "Engine Repair"
+              phone: "+1-555-234-5678"
+              address: "12 Oak Street, Metropolis, NY"
+              salary: 45000
+      responses:
+        201:
+          description: "Mechanic created successfully"
+          schema:
+            $ref: '#/definitions/Mechanic'
+          examples:
+            application/json:
+              id: 1
+              name: "Emily Smith"
+              email: "emily@example.com"
+              specialty: "Engine Repair"
+              phone: "+1-555-234-5678"
+              address: "12 Oak Street, Metropolis, NY"
+              salary: 45000
+# Retrieve a paginated list of all registered mechanics (requires authentication)
+  /mechanics/:
+    get:
+      tags:
+        - Mechanics
+      summary: Find All Mechanics (Paginated)
+      description: Returns a paginated list of mechanics.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          type: integer
+          required: false
+          description: "Page number (default: 1)"
+        - name: per_page
+          in: query
+          type: integer
+          required: false
+          description: "Results per page (default: 10)"
+      responses:
+        200:
+          description: A paginated list of mechanics.
+          schema:
+            type: object
+            properties:
+              mechanics:
+                type: array
+                items:
+                  $ref: '#/definitions/Mechanic'
+              total:
+                type: integer
+              pages:
+                type: integer
+              current_page:
+                type: integer
+# Authenticate a mechanic and return a JWT token
+  /mechanics/login:
+    post:
+      tags:
+        - Mechanics
+      summary: Mechanic Login (Token Auth)
+      description: "Logs in a mechanic and returns a JWT token along with mechanic details."
+      parameters:
+        - in: body
+          name: credentials
+          required: true
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+              password:
+                type: string
+            example:
+              email: "emily@example.com"
+              password: "supersecure123"
+      responses:
+        200:
+          description: "Login successful"
+          schema:
+            type: object
+            properties:
+              mechanic_id:
+                type: integer
+              mechanic_name:
+                type: string
+              message:
+                type: string
+              token:
+                type: string
+          examples:
+            application/json:
+              mechanic_id: 35
+              mechanic_name: "Samantha Lee"
+              message: "Login successful"
+              token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkI..."
+# Retrieve mechanic details by their ID (requires authentication)
+  /mechanics/{id}:
+    get:
+      tags: [Mechanics]
+      summary: Find Mechanic by ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: integer
+      responses:
+        200:
+          schema:
+            $ref: '#/definitions/Mechanic'
+# Update a mechanic's information by their ID (requires authentication)
+    put:
+      tags:
+        - Mechanics
+      summary: Update Mechanic by ID
+      description: "Updates an existing mechanic account."
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          type: integer
+          required: true
+          description: ID of the mechanic to update
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/MechanicInput'
+            example:
+              name: "Emily Smith"
+              email: "emily@example.com"
+              password: "newpassword123"
+              specialty: "Engine Repair"
+              phone: "+1-555-234-5678"
+              address: "12 Oak Street, Metropolis, NY"
+              salary: 45000
+      responses:
+        200:
+          description: "Mechanic updated successfully"
+          schema:
+            $ref: '#/definitions/Mechanic'
+          examples:
+            application/json:
+              id: 1
+              name: "Emily Smith"
+              email: "emily@example.com"
+              specialty: "Engine Repair"
+              phone: "+1-555-234-5678"
+              address: "12 Oak Street, Metropolis, NY"
+              salary: 45000
+# Delete a mechanic account by their ID (requires authentication)
+    delete:
+      tags: [Mechanics]
+      summary: Delete Mechanic by ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: integer
+      responses:
+        204:
+          description: Mechanic deleted successfully
+# Retrieve a list of top-performing mechanics (requires authentication)
+  /mechanics/top:
+    get:
+      tags: [Mechanics]
+      summary: Find Top Mechanics
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Top mechanics
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Mechanic'
+# Create a new service ticket (requires authentication)
+  /service-tickets:
+    post:
+      tags:
+        - Service Tickets
+      summary: Create Service Ticket
+      description: "Creates a new service ticket."
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/ServiceTicketInput'
+            example:
+              description: "Oil change and brake inspection"
+              customer_id: 1
+              vin: "1HGCM82633A123456"
+      responses:
+        201:
+          description: "Service ticket created successfully"
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              ticket:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  customer_id:
+                    type: integer
+                  description:
+                    type: string
+                  vin:
+                    type: string
+                  mechanics:
+                    type: array
+                    items:
+                      type: object
+                  parts:
+                    type: array
+                    items:
+                      type: object
+          examples:
+            application/json:
+              message: "Service ticket created successfully."
+              ticket:
+                id: 101
+                customer_id: 1
+                description: "Oil change and brake inspection"
+                vin: "1HGCM82633A123456"
+                mechanics: []
+                parts: []
+# Retrieve a paginated list of all service tickets (requires authentication)
+  /service-tickets/:
+    get:
+      tags:
+        - Service Tickets
+      summary: Find All Service Tickets (Paginated)
+      description: Returns a paginated list of service tickets.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          type: integer
+          required: false
+          description: "Page number (default: 1)"
+        - name: per_page
+          in: query
+          type: integer
+          required: false
+          description: "Results per page (default: 10)"
+      responses:
+        200:
+          description: A paginated list of service tickets.
+          schema:
+            type: object
+            properties:
+              service_tickets:
+                type: array
+                items:
+                  $ref: '#/definitions/ServiceTicket'
+              total:
+                type: integer
+              pages:
+                type: integer
+              current_page:
+                type: integer
+# Retrieve service ticket details by ID (requires authentication)
+  /service-tickets/{id}:
+    get: 
+      tags: [Service Tickets]
+      summary: Find Service Ticket by ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: integer
+      responses:
+        200:
+          schema:
+            $ref: '#/definitions/ServiceTicket'
+# Update a service ticket's details by ID (requires authentication)
+    put:
+      tags:
+        - Service Tickets
+      summary: Update service ticket by ID
+      description: "Updates an existing service ticket."
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          type: integer
+          required: true
+          description: ID of the service ticket to update
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/ServiceTicketInput'
+            example:
+              description: "Brake pad replacement"
+              customer_id: 1
+              vin: "1HGCM82633A123456"
+      responses:
+        200:
+          description: "Service ticket updated successfully"
+          schema:
+            $ref: '#/definitions/ServiceTicket'
+          examples:
+            application/json:
+              id: 101
+              customer_id: 1
+              description: "Brake pad replacement"
+              vin: "1HGCM82633A123456"
+# Delete a service ticket by ID (requires authentication)
+    delete:
+      tags: [Service Tickets]
+      summary: Delete Service Ticket by ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: integer
+      responses:
+        204:
+          description: Service Ticket deleted successfully
+# Assign a mechanic to a service ticket by their IDs (requires authentication)
+  /service-tickets/{ticket_id}/assign-mechanic/{mechanic_id}:
+    put:
+      tags: [Service Tickets]
+      summary: Assign Mechanic to Service Ticket by ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: ticket_id
+          in: path
+          required: true
+          type: integer
+        - name: mechanic_id
+          in: path
+          required: true
+          type: integer
+      responses:
+        200:
+          description: Mechanic assigned successfully
+# Remove a mechanic from a service ticket by their IDs (requires authentication)
+  /service-tickets/{ticket_id}/remove-mechanic/{mechanic_id}:
+    delete:
+      tags: [Service Tickets]
+      summary: Remove Mechanic from Service Ticket by ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: ticket_id
+          in: path
+          required: true
+          type: integer
+        - name: mechanic_id
+          in: path
+          required: true
+          type: integer
+      responses:
+        204:
+          description: Mechanic removed successfully
+# Add or remove mechanics on a service ticket by ID (requires authentication)
+  /service-tickets/{ticket_id}/edit:
+    put:
+      tags: [Service Tickets]
+      summary: Edit Mechanics on Service Ticket by ID
+      description: Add or remove mechanics from a service ticket
+      security:
+        - BearerAuth: []
+      consumes:
+        - application/json
+      parameters:
+        - name: ticket_id
+          in: path
+          required: true
+          type: integer
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              add_ids:
+                type: array
+                items:
+                  type: integer
+                example: [0]
+              remove_ids:
+                type: array
+                items:
+                  type: integer
+                example: [0]
+            required:
+              - add_ids
+              - remove_ids
+      responses:
+        200:
+          description: Service ticket edited successfully
+          schema:
+            $ref: '#/definitions/ServiceTicket'
+# Add parts to a service ticket by ID (requires authentication)
+  /service-tickets/{ticket_id}/add-parts:
+    post:
+      tags: [Service Tickets]
+      summary: Add Parts to Service Ticket by ID
+      security:
+        - BearerAuth: []
+      consumes:
+        - application/json
+      parameters:
+        - name: ticket_id
+          in: path
+          required: true
+          type: integer
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              part_ids:
+                type: array
+                items:
+                  type: integer
+                example: [0]
+      responses:
+        200:
+          description: Parts added successfully
+# Retrieve all parts associated with a service ticket by ID (requires authentication)
+  /service-tickets/{ticket_id}/parts:
+    get:
+      tags: [Service Tickets]
+      summary: Find Parts on Service Ticket by ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: ticket_id
+          in: path
+          required: true
+          type: integer
+      responses:
+        200:
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Inventory'
+# Remove a part from a service ticket by ID (requires authentication)
+  /service-tickets/{ticket_id}/remove-part/{part_id}:
+    delete:
+      tags: [Service Tickets]
+      summary: Remove Parts from Service Ticket by ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: ticket_id
+          in: path
+          required: true
+          type: integer
+        - name: part_id
+          in: path
+          required: true
+          type: integer
+      responses:
+        204:
+          description: Part removed successfully
+# Create a new inventory part (requires authentication)
+  /inventory:
+    post:
+      tags:
+        - Inventory
+      summary: Create Part
+      description: "Creates a new inventory part."
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/InventoryInput'
+            example:
+              name: "Brake Pad"
+              sku: "BP-12345"
+              description: "Front brake pads for sedan models"
+              price: 49.99
+      responses:
+        201:
+          description: "Inventory part created successfully"
+          schema:
+            $ref: '#/definitions/Inventory'
+          examples:
+            application/json:
+              id: 101
+              name: "Brake Pad"
+              sku: "BP-12345"
+              description: "Front brake pads for sedan models"
+              price: 49.99
+# Retrieve a paginated list of all inventory parts (requires authentication)
+  /inventory/:
+    get:
+      tags:
+        - Inventory
+      summary: Find All Parts (Paginated)
+      description: Returns a paginated list of inventory parts.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          type: integer
+          required: false
+          description: "Page number (default: 1)"
+        - name: per_page
+          in: query
+          type: integer
+          required: false
+          description: "Results per page (default: 10)"
+      responses:
+        200:
+          description: A paginated list of inventory parts.
+          schema:
+            type: object
+            properties:
+              inventory:
+                type: array
+                items:
+                  $ref: '#/definitions/Inventory'
+              total:
+                type: integer
+              pages:
+                type: integer
+              current_page:
+                type: integer
+# Retrieve inventory part details by ID (requires authentication)
+  /inventory/{id}:
+    get:
+      tags:
+        - Inventory
+      summary: Find Part by ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: integer
+      responses:
+        200:
+          description: Inventory part details
+          schema:
+            $ref: '#/definitions/Inventory'
+# Update an inventory part's details by ID (requires authentication)
+    put:
+      tags:
+        - Inventory
+      summary: Update Part by ID
+      description: "Updates an existing inventory part."
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          type: integer
+          required: true
+          description: ID of the inventory part to update
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/InventoryInput'
+            example:
+              name: "Brake Pad"
+              sku: "BP-12345"
+              description: "Front brake pads for sedan models (updated)"
+              price: 54.99
+      responses:
+        200:
+          description: "Inventory part updated successfully"
+          schema:
+            $ref: '#/definitions/Inventory'
+          examples:
+            application/json:
+              id: 101
+              name: "Brake Pad"
+              sku: "BP-12345"
+              description: "Front brake pads for sedan models (updated)"
+              price: 54.99
+# Delete an inventory part by ID (requires authentication)
+    delete:
+      tags:
+        - Inventory
+      summary: Delete Part by ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: integer
+      responses:
+        204:
+          description: Inventory part deleted successfully
+# Customer object model representing a registered customer’s details
+definitions:
+  Customer:
+    type: object
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      email:
+        type: string
+      address:
+        type: string
+      phone:
+        type: string
+    required:
+      - name
+      - email
+      - address
+      - phone
+# Input model for creating or updating a customer with required fields
+  CustomerInput:
+    type: object
+    required: [name, email, password, address, phone]
+    properties:
+      name:
+        type: string
+      email:
+        type: string
+      password:
+        type: string
+      address:
+        type: string
+      phone:
+        type: string
+# Mechanic object model representing a mechanic’s profile and details
+  Mechanic:
+    type: object
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      email:
+        type: string
+      phone:
+        type: string
+      specialty:
+        type: string
+      salary:
+        type: number
+    required:
+      - name
+      - email
+      - phone
+      - specialty
+      - salary
+# Input model for creating or updating a mechanic with required fields
+  MechanicInput:
+    type: object
+    required: [name, email, password, address, phone, specialty, salary]
+    properties:
+      name:
+        type: string
+      email:
+        type: string
+      password:
+        type: string
+      address:
+        type: string
+      phone:
+        type: string
+      specialty:
+        type: string
+      salary:
+        type: number
+# ServiceTicket object model representing a service ticket's details
+  ServiceTicket:
+    type: object
+    properties:
+      id:
+        type: integer
+      description:
+        type: string
+      customer_id:
+        type: integer
+      vin:
+        type: string
+    required:
+      - id
+      - description
+      - customer_id
+      - vin   
+# Input model for creating or updating a service ticket with required fields
+  ServiceTicketInput:
+    type: object
+    required: [description, customer_id, vin]
+    properties:
+      description:
+        type: string
+      customer_id:
+        type: integer
+      vin:
+        type: string
+        description: Vehicle Identification Number 
+        example: "1HGCM82633A123456"
+# Inventory object model representing a part’s details in stock
+  Inventory:
+    type: object
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      sku:
+        type: string
+      description:
+        type: string
+      price:
+        type: number
+    required:
+      - name
+      - sku
+      - description
+      - price
+# Input model for creating or updating an inventory part with required fields
+  InventoryInput:
+    type: object
+    required:
+      - name
+      - sku
+      - description
+      - price
+    properties:
+      name:
+        type: string
+      sku:
+        type: string
+      description:
+        type: string
+      price:
+        type: number
