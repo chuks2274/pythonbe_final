@@ -17,6 +17,7 @@ flask-swagger-ui==5.21.0
 greenlet==3.2.3
 gunicorn==23.0.0
 idna==3.10
+iniconfig==2.1.0
 itsdangerous==2.2.0
 Jinja2==3.1.6
 limits==5.4.0
@@ -31,9 +32,11 @@ numpy==2.2.4
 ordered-set==4.1.0
 packaging==25.0
 pandas==2.2.3
+pluggy==1.6.0
 psycopg2-binary==2.9.10
 Pygments==2.19.2
 PyJWT==2.10.1
+pytest==8.4.1
 python-dateutil==2.9.0.post0
 python-dotenv==1.1.1
 pytz==2025.2
