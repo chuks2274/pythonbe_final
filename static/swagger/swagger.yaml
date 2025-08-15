@@ -5,10 +5,10 @@ info:
   title: Mechanic Workshop API
   description: API documentation for Customers, Mechanics, Service Tickets, and Inventory.
 # API server configuration specifying host, base path, and HTTP scheme
-host: localhost:5000
+host: pythonbe-final.onrender.com
 basePath: /api
 schemes:
-  - http
+  - https
 # Security definition for JWT Bearer token authentication via Authorization header
 securityDefinitions:
   BearerAuth:
