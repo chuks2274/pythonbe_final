@@ -1,7 +1,7 @@
 import os
 from flask_cors import CORS
 from flask_swagger_ui import get_swaggerui_blueprint
-from flask import send_file
+from flask import send_file, jsonify
 from application import create_app
 from application.extensions import db
 from application.error_handlers import register_error_handlers
@@ -40,6 +40,11 @@ app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
 def swagger_yaml():
     swagger_path = os.path.join(os.path.dirname(__file__), 'static', 'swagger', 'swagger.yaml')
     return send_file(swagger_path, mimetype='text/yaml')
+
+# === Add a simple API test route ===
+@app.route("/api/")
+def api_root():
+    return jsonify({"message": "API is working"})
 
 # Create tables if not exist
 with app.app_context():
