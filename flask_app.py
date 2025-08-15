@@ -25,14 +25,19 @@ CORS(app)
 # Register error handlers
 register_error_handlers(app)
 
-# Swagger UI setup
+# === Swagger UI setup (Render-compatible) ===
 SWAGGER_URL = '/docs'
-API_URL = '/swagger.yaml'
+API_URL = 'https://pythonbe-final.onrender.com/swagger.yaml'  # Absolute URL for Render
+
 swaggerui_blueprint = get_swaggerui_blueprint(
     SWAGGER_URL,
     API_URL,
-    config={'app_name': "Auto Workshop API"}
+    config={
+        'app_name': "Auto Workshop API",
+        'validatorUrl': None  # Disable online validation to prevent CORS issues
+    }
 )
+
 app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
 
 # Serve Swagger YAML
