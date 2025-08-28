@@ -538,8 +538,8 @@ Follow these steps to set up the application on your local machine:
 
 ### Clone the Repository
 ```bash
-git clone https://github.com/your-username/your-repo.git
-cd assignment
+git clone https://github.com/chuks2274/pythonbe_final.git
+cd shop-final
 
 ### Create and Activate a Virtual Environment
 Run the following commands:
